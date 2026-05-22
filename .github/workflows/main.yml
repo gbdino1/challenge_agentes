@@ -1,25 +1,50 @@
-name: DevSecOps Pipeline
+name: Pipeline CSPM + DevSecOps
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   security-scan:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Baixar código
-        uses: actions/checkout@v3
+      # 1. Faz o checkout do código
+      - name: Checkout do código
+        uses: actions/checkout@v4
 
+      # 2. Configura o Python
       - name: Configurar Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
-      - name: Rodar agente CSPM
+      # 3. Roda o Agente CSPM (analisa insecure.tf → gera resultado.json)
+      - name: Rodar Agente CSPM
         run: python cspm_agente.py
 
-      - name: Rodar agente DevSecOps
+      # 4. Roda o Agente DevSecOps (analisa app.js → gera resultado_devsecops.json)
+      - name: Rodar Agente DevSecOps
         run: python devsecops_agente.py
+
+      # 5. Consolida os dois resultados em um único relatório
+      - name: Consolidar Resultados
+        run: python consolidador.py
+
+      # 6. Salva o relatório consolidado como artifact no GitHub
+      - name: Salvar Relatório Consolidado como Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: relatorio-consolidado-${{ github.run_number }}
+          path: relatorio_consolidado.json
+          retention-days: 30
+
+      # 7. Envia notificação por e-mail com o resumo
+      - name: Enviar Notificação por E-mail
+        env:
+          EMAIL_SENDER: ${{ secrets.EMAIL_SENDER }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          EMAIL_RECEIVER: ${{ secrets.EMAIL_RECEIVER }}
+        run: python notify.py
