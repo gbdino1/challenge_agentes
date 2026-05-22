@@ -46,4 +46,3 @@ def analisar_codigo(caminho):
 
 # EXECUÇÃO
 analisar_codigo("app.js")
-
