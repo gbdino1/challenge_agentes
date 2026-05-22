@@ -22,4 +22,4 @@ jobs:
         run: python cspm_agente.py
 
       - name: Rodar agente DevSecOps
-        run: python devsecops_agent.py
+        run: python devsecops_agente.py
