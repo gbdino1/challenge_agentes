@@ -1,25 +1,58 @@
-name: DevSecOps Pipeline
+name: Pipeline CSPM + DevSecOps
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   security-scan:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Baixar código
-        uses: actions/checkout@v3
+      # 1. Checkout do código
+      - name: Checkout do código
+        uses: actions/checkout@v4
 
+      # 2. Configura o Python
       - name: Configurar Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
-      - name: Rodar agente CSPM
+      # 3. Instala o wkhtmltopdf para geração de PDF
+      - name: Instalar wkhtmltopdf
+        run: sudo apt-get install -y wkhtmltopdf
+
+      # 4. Roda o Agente CSPM → gera resultado.json
+      - name: Rodar Agente CSPM
         run: python cspm_agente.py
 
-      - name: Rodar agente DevSecOps
+      # 5. Roda o Agente DevSecOps → gera resultado_devsecops.json
+      - name: Rodar Agente DevSecOps
         run: python devsecops_agente.py
+
+      # 6. Consolida os dois JSONs em um único relatório
+      - name: Consolidar Resultados
+        run: python consolidador.py
+
+      # 7. Gera o relatório em PDF
+      - name: Gerar Relatório PDF
+        run: python gerar_pdf.py
+
+      # 8. Salva o JSON consolidado como artifact
+      - name: Salvar JSON Consolidado como Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: relatorio-json-${{ github.run_number }}
+          path: relatorio_consolidado.json
+          retention-days: 30
+
+      # 9. Salva o PDF como artifact
+      - name: Salvar PDF como Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: relatorio-pdf-${{ github.run_number }}
+          path: relatorio_final.pdf
+          retention-days: 30
