@@ -1,15 +1,16 @@
 import json
 import subprocess
+import os
 from datetime import datetime
 
 def gerar_pdf():
     with open("relatorio_consolidado.json", "r") as f:
         data = json.load(f)
 
-    resumo   = data["resumo"]
-    cspm     = data["cspm"]["detalhes"]
+    resumo    = data["resumo"]
+    cspm      = data["cspm"]["detalhes"]
     devsecops = data["devsecops"]["detalhes"]
-    agora    = datetime.now().strftime("%d/%m/%Y %H:%M")
+    agora     = datetime.now().strftime("%d/%m/%Y %H:%M")
 
     def linha_tabela(v):
         cor = {"Crítica": "#ff4444", "Alta": "#ff8800", "Média": "#ffcc00"}.get(v["severidade"], "#333")
@@ -68,10 +69,6 @@ def gerar_pdf():
                 border-left: 5px solid #0f3460;
                 margin-bottom: 20px;
             }}
-            .resumo p {{
-                margin: 6px 0;
-                font-size: 15px;
-            }}
             .badge {{
                 display: inline-block;
                 padding: 3px 10px;
@@ -95,11 +92,11 @@ def gerar_pdf():
     </head>
     <body>
 
-        <h1>🔐 Relatório Consolidado de Segurança</h1>
+        <h1>Relatório Consolidado de Segurança</h1>
         <p>Gerado automaticamente via GitHub Actions em: <b>{agora}</b></p>
 
         <div class='resumo'>
-            <h2>📊 Resumo Geral</h2>
+            <h2>Resumo Geral</h2>
             <p>
                 <span class='badge critica'>🔴 Críticas: {resumo['criticas']}</span>
                 <span class='badge alta'>🟠 Altas: {resumo['altas']}</span>
@@ -108,7 +105,7 @@ def gerar_pdf():
             </p>
         </div>
 
-        <h2>🔍 Agente CSPM — Infraestrutura (Terraform)</h2>
+        <h2>Agente CSPM — Infraestrutura (Terraform)</h2>
         <table>
             <tr>
                 <th>Tipo</th>
@@ -119,7 +116,7 @@ def gerar_pdf():
             {''.join(linha_tabela(v) for v in cspm)}
         </table>
 
-        <h2>🛡️ Agente DevSecOps — Código (app.js)</h2>
+        <h2>Agente DevSecOps — Código (app.js)</h2>
         <table>
             <tr>
                 <th>Tipo</th>
@@ -141,8 +138,14 @@ def gerar_pdf():
     with open("relatorio.html", "w", encoding="utf-8") as f:
         f.write(html)
 
+    # Detecta automaticamente se está no Windows ou Linux (GitHub Actions)
+    if os.name == "nt":
+        wkhtmltopdf = r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe"
+    else:
+        wkhtmltopdf = "wkhtmltopdf"
+
     subprocess.run(
-        ["wkhtmltopdf", "--encoding", "utf-8", "relatorio.html", "relatorio_final.pdf"],
+        [wkhtmltopdf, "--encoding", "utf-8", "relatorio.html", "relatorio_final.pdf"],
         check=True
     )
 
