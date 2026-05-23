@@ -1,0 +1,54 @@
+{
+    "resumo": {
+        "total_geral": 6,
+        "criticas": 2,
+        "altas": 3,
+        "medias": 1
+    },
+    "cspm": {
+        "total_vulnerabilidades": 3,
+        "detalhes": [
+            {
+                "tipo": "S3 público",
+                "severidade": "Alta",
+                "descricao": "Bucket S3 com acesso público.",
+                "correcao": "Definir ACL privada."
+            },
+            {
+                "tipo": "SSH aberto",
+                "severidade": "Crítica",
+                "descricao": "Porta 22 aberta para qualquer IP.",
+                "correcao": "Restringir acesso SSH."
+            },
+            {
+                "tipo": "RDP aberto",
+                "severidade": "Crítica",
+                "descricao": "Porta 3389 aberta para qualquer IP.",
+                "correcao": "Restringir acesso RDP."
+            }
+        ]
+    },
+    "devsecops": {
+        "total_vulnerabilidades": 3,
+        "detalhes": [
+            {
+                "tipo": "Uso de eval",
+                "severidade": "Alta",
+                "descricao": "Uso de eval pode executar código malicioso.",
+                "correcao": "Evitar eval."
+            },
+            {
+                "tipo": "Senha exposta",
+                "severidade": "Alta",
+                "descricao": "Senha hardcoded detectada.",
+                "correcao": "Usar variável de ambiente."
+            },
+            {
+                "tipo": "Exposição de dados",
+                "severidade": "Média",
+                "descricao": "console.log pode expor dados.",
+                "correcao": "Remover logs sensíveis."
+            }
+        ]
+    }
+}

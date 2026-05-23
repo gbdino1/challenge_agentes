@@ -26,7 +26,7 @@ def consolidar():
     with open("relatorio_consolidado.json", "w") as f:
         json.dump(relatorio_final, f, indent=4, ensure_ascii=False)
 
-    print("✅ Relatório consolidado gerado!")
+    print("Relatório consolidado gerado!")
     print(json.dumps(relatorio_final["resumo"], indent=4, ensure_ascii=False))
 
 consolidar()
