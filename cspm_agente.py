@@ -50,3 +50,6 @@ def analisar_terraform(caminho_arquivo):
 
 # EXECUÇÃO
 analisar_terraform("insecure.tf")
+
+
+
